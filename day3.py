@@ -68,3 +68,58 @@ print(('Input', 'N (ring number)', 'M (first number in ring)', 'index in output 
 sequence_of_number_of_required_steps = sequence_for_ring(N)
 index = (input_data - M)
 print((input_data, N, M, index, sequence_of_number_of_required_steps[index]))
+
+
+#########################################
+# PUZZLE 2
+#########################################
+
+def ring_coordinates(ring_number):
+    '''
+    Returns a list with all the grid coordinates for a specified ring, starting with the coordinate
+    of the lowest number in the ring, e.g. for ring 1 it returns
+      [(1,0), (1,1), (0,1), (-1,1), (-1,0), (-1,-1), (0,-1), (1,-1)]
+    '''
+
+    if ring_number == 0:
+        return [(0,0)]
+    
+    going_up = [(ring_number, i) for i in range(-ring_number+1, ring_number+1)]
+    going_left = [(i, ring_number) for i in range(ring_number-1, -(ring_number+1), -1)]
+    going_down = [(-ring_number, i) for i in range(ring_number-1, -(ring_number+1), -1)]
+    going_right = [(i, -ring_number) for i in range(-(ring_number-1), (ring_number+1))]
+    return going_up + going_left + going_down + going_right
+
+def neighbor_coordinates(coord):
+    '''
+    Returns the coordinates of the 8 neighboring cells to the cell in the specified coordinate.
+    '''
+
+    return [(coord[0]+1, coord[1]  ),
+            (coord[0]+1, coord[1]+1),
+            (coord[0]  , coord[1]+1),
+            (coord[0]-1, coord[1]+1),
+            (coord[0]-1, coord[1]  ),
+            (coord[0]-1, coord[1]-1),
+            (coord[0]  , coord[1]-1),
+            (coord[0]+1, coord[1]-1)]
+
+quadrant_size = 10
+grid_side = (quadrant_size*2 + 1)
+grid = [[0] * grid_side for _ in range(0, grid_side)]
+
+all_coordinates = [coordinate for i in range(0, 10) for coordinate in ring_coordinates(i)]
+
+grid[0][0] = 1
+print(grid)
+
+value_to_write = 0
+index = 1 # Note that index 1 is the second item in the coordinate array, thus the one for the first square in ring 2
+while value_to_write < input_data:
+    current_coords = all_coordinates[index]
+    value_to_write = sum(grid[i[0]][i[1]] for i in neighbor_coordinates(current_coords))
+    print('Writing {0} to coords ({1},{2})'.format(value_to_write, current_coords[0], current_coords[1]))
+    grid[current_coords[0]][current_coords[1]] = value_to_write
+    index += 1
+
+print('First value larger than {0} is {1}'.format(input_data, value_to_write))
