@@ -30,3 +30,4 @@ while (redist_string not in seen_states):
     print("{0} after {1} redistribution cycles".format(redist_string, redistributions))
 
 print('Repeated configuration after {0} redistribution cycles.'.format(redistributions))
+print('Size of loop: {0}'.format(redistributions - seen_states.index(redist_string)))
