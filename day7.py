@@ -7,6 +7,7 @@ class ProgramData:
         self.weight = weight
         self.children = children
         self.childrenObjects = []
+        self.tower_weight = 0
 
 def transform_line_to_program_data(line: str):
     first_split = line.split(" -> ")
@@ -49,3 +50,34 @@ while(len(programs) > 0):
     steps += 1
 
 print(tree.name)
+
+def calculate_tower_weight(node: ProgramData):
+    node.tower_weight = node.weight + sum([calculate_tower_weight(child) for child in node.childrenObjects])
+
+def find_wrong_node_and_return_correct_weight(node: ProgramData):
+    (wrong_child, expected_weight) = get_correct_weight(node.childrenObjects)
+    if (wrong_child == None):
+        print('Found wrong node! {0} with tower_weight {1}'.format(node.name, node.tower_weight))
+        return node.name
+    else:
+        return find_wrong_node_and_return_correct_weight(wrong_child)
+
+def get_correct_weight(items: [ProgramData]):
+    # By design of the challenge, items will always have 3 or more items
+    # (because it's impossible to determine which of two distinct elements)
+    # is the wrong one; either could be corrected up or down)
+    if (len(items) == 0):
+        return (None, 0)
+    
+    if (len(items) <= 2):
+        return (None, items[0].tower_weight)
+    
+    correct_weight = items[0].tower_weight if items[0].tower_weight == items[1].tower_weight \
+                                           else (items[0].tower_weight if items[0].tower_weight == items[2].tower_weight \
+                                                                       else items[1].tower_weight)
+    wrong_items = [i for i in items if i.tower_weight != correct_weight]
+    if (len(wrong_items) > 0):
+        return (wrong_items[0], correct_weight)
+    return (None, correct_weight)
+
+print(calculate_tower_weight(tree))
